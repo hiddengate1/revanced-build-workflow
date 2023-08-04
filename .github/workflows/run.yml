@@ -45,7 +45,7 @@ jobs:
           fileName: "*.apk"
       - name: Download apk
         run: |
-          wget ${{ inputs.apkURL }} input.apk
+          wget ${{ inputs.apkURL }} -o input.apk
       - name: Patch the apk
         run: |
           java -Xmx2048M -jar ${{ fromJson(steps.cli.outputs.downloaded_files)[0] }} \
