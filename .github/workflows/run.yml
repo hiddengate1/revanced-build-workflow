@@ -22,6 +22,8 @@ jobs:
         with:
           java-version: 17
           distribution: 'zulu'
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Download cli
         id: cli
         uses: robinraju/release-downloader@v1.8
@@ -46,8 +48,6 @@ jobs:
       - name: Download apk
         run: |
           wget -O input.apk ${{ inputs.apkURL }}
-      - name: Checkout repository
-        uses: actions/checkout@v3
       - name: Patch the apk
         run: |
           java -Xmx2048M -jar ${{ fromJson(steps.cli.outputs.downloaded_files)[0] }} \
