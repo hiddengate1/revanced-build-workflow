@@ -45,11 +45,10 @@ jobs:
           fileName: "*.apk"
       - name: Download apk
         run: |
-          wget ${{ inputs.apkURL }} -o input.apk
+          wget -O input.apk ${{ inputs.apkURL }}
       - name: Patch the apk
         run: |
-          cp ${{ fromJson(steps.cli.outputs.downloaded_files)[0] }} ./cli.jar
-          java -Xmx2048M -jar cli.jar \
+          java -Xmx2048M -jar ${{ fromJson(steps.cli.outputs.downloaded_files)[0] }} \
           -a input.apk \
           -b ${{ fromJson(steps.patch.outputs.downloaded_files)[0] }} \
           -m ${{ fromJson(steps.integration.outputs.downloaded_files)[0] }} \
@@ -59,6 +58,6 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: input.apk
+          file: output.apk
           tag: ${{ github.ref }}
           overwrite: true
