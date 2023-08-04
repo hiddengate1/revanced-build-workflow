@@ -1,0 +1,63 @@
+name: Run revanced build
+
+on:
+  workflow_dispatch:
+    inputs:
+      apkURL:
+        description: 'Apk url'
+        required: true
+        type: string
+      additionalArgs:
+        description: 'Additional arguments'
+        required: false
+        type: string
+
+jobs:
+  build:
+    name: Patch revanced apk
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'zulu'
+      - name: Download cli
+        id: cli
+        uses: robinraju/release-downloader@v1.8
+        with:
+          repository: "revanced/revanced-cli"
+          latest: true
+          fileName: "*.jar" 
+      - name: Download patch
+        id: patch
+        uses: robinraju/release-downloader@v1.8
+        with:
+          repository: "revanced/revanced-patches"
+          latest: true
+          fileName: "*.jar"
+      - name: Download integration
+        id: integration
+        uses: robinraju/release-downloader@v1.8
+        with:
+          repository: "revanced/revanced-integrations"
+          latest: true
+          fileName: "*.apk"
+      - name: Download apk
+        run: |
+          wget ${{ inputs.apkURL }} input.apk
+      - name: Patch the apk
+        run: |
+          java -Xmx2048M -jar ${{ fromJson(steps.cli.outputs.downloaded_files)[0] }} \
+          -a input.apk \
+          -b ${{ fromJson(steps.patch.outputs.downloaded_files)[0] }} \
+          -m ${{ fromJson(steps.integration.outputs.downloaded_files)[0] }} \
+          -o output.apk \
+          ${{ inputs.additionalArgs }}
+      - name: Upload to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: output.apk
+          tag: ${{ github.ref }}
+          overwrite: true
