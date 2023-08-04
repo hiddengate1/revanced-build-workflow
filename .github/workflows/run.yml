@@ -48,7 +48,8 @@ jobs:
           wget ${{ inputs.apkURL }} -o input.apk
       - name: Patch the apk
         run: |
-          java -Xmx2048M -jar ${{ fromJson(steps.cli.outputs.downloaded_files)[0] }} \
+          cp ${{ fromJson(steps.cli.outputs.downloaded_files)[0] }} ./cli.jar
+          java -Xmx2048M -jar cli.jar \
           -a input.apk \
           -b ${{ fromJson(steps.patch.outputs.downloaded_files)[0] }} \
           -m ${{ fromJson(steps.integration.outputs.downloaded_files)[0] }} \
