@@ -46,6 +46,8 @@ jobs:
       - name: Download apk
         run: |
           wget -O input.apk ${{ inputs.apkURL }}
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - name: Patch the apk
         run: |
           java -Xmx2048M -jar ${{ fromJson(steps.cli.outputs.downloaded_files)[0] }} \
